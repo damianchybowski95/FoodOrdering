@@ -1,16 +1,13 @@
-import products from "@/assets/data/products";
-import ProductListItem from "@/src/components/ProductListItem";
-import { View } from "react-native";
+import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import { Redirect } from 'expo-router'
 
-const product = products[0];
-
-export default function TabOneScreen() {
+const TabsIndex = () => {
   return (
-    <View>
-      <ProductListItem product={products[0]}/>
-      <ProductListItem product={products[1]}/>
-    </View>
-  );
+    <Redirect href={`/menu/`}/>
+  )
 }
 
+export default TabsIndex
 
+const styles = StyleSheet.create({})

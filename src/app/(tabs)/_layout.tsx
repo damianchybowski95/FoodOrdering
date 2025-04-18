@@ -12,7 +12,7 @@ function TabBarIcon(props: Readonly<{
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }>) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -25,12 +25,13 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
-      }}>
+      }}>      
       <Tabs.Screen
-        name="index"
+        name="menu"        
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Menu',
+          headerShown : false,
+          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -50,10 +51,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
+      {/* Usuwa z menu element który służy do przekierowania do karty menu. Indeks głównej nawigacji tylko przekierowuje do menu*/}
+      <Tabs.Screen name="index" options={{ href : null }}/>
     </Tabs>
   );
 }
