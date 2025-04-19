@@ -9,9 +9,7 @@ export const defaultPizzaImage =
 
 const ProductListItem = ({ product }: { product: Product }) => {
   const segments = useSegments()
-  useEffect(()=>{
-    console.log( segments[0] );
-  },[])
+
   return (
     // asChild sprawia że produkt bedzie renderowany jako podrzędny View, nie zmieni nic w stylach elementu, gdy domyślnie dodałby dodałby div
     // Wymogiem link jest użycie child node który ma onPress event, dlatego zamiast view jest pressable
