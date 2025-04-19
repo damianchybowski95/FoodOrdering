@@ -1,16 +1,21 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import Colors from "@/src/constants/Colors";
 import { Product } from "@/src/types";
-import { Link } from "expo-router";
+import { Link, useSegments } from "expo-router";
+import { useEffect } from "react";
 
 export const defaultPizzaImage =
   "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
 
 const ProductListItem = ({ product }: { product: Product }) => {
+  const segments = useSegments()
+  useEffect(()=>{
+    console.log( segments[0] );
+  },[])
   return (
     // asChild sprawia że produkt bedzie renderowany jako podrzędny View, nie zmieni nic w stylach elementu, gdy domyślnie dodałby dodałby div
     // Wymogiem link jest użycie child node który ma onPress event, dlatego zamiast view jest pressable
-    <Link href={`/menu/${product.id}`} asChild> 
+    <Link href={`/${segments[0]}/menu/${product.id}`} asChild> 
       <Pressable style={styles.container}>
         <Image
           source={{ uri: product.image || defaultPizzaImage }}
