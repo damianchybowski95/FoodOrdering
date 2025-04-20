@@ -1,14 +1,8 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "@/src/components/Button";
 import Colors from "@/src/constants/Colors";
 import { useRouter } from "expo-router";
-
-interface PossibleFormErrors {
-  invalidEmail : string;
-  passwordTooShort : string;
-  differentPasswords : string;
-}
 
 const AuthenticationPage = () => {
   const router = useRouter();

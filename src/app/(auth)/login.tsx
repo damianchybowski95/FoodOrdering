@@ -2,7 +2,7 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useState } from "react";
 import Button from "@/src/components/Button";
 import Colors from "@/src/constants/Colors";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 
 const AuthenticationPage = () => {
   const router = useRouter();
