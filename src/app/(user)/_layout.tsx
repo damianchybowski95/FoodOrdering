@@ -44,8 +44,6 @@ export default function TabLayout() {
       />
       {/* Usuwa z menu element który służy do przekierowania do karty menu. Indeks głównej nawigacji tylko przekierowuje do menu*/}
       <Tabs.Screen name="index" options={{ href : null }}/>
-      {/* Pewnie da się go znaleźć i usunąć ten plik */}
-      <Tabs.Screen name="order" options={{href : null}}/>
     </Tabs>
   );
 }
