@@ -1,8 +1,9 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useState } from "react";
 import Button from "@/src/components/Button";
 import Colors from "@/src/constants/Colors";
 import { useRouter } from "expo-router";
+import { supabase } from "@/src/lib/supabase";
 
 const AuthenticationPage = () => {
   const router = useRouter();
@@ -11,9 +12,9 @@ const AuthenticationPage = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [formError, setFormError] = useState<string>("");
+  const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
   function onSignIn() {
-    console.log("onSignIn clicked");
     router.push("/(auth)/login");
   }
 
@@ -30,7 +31,7 @@ const AuthenticationPage = () => {
   }
 
   function validatePassword(): boolean {
-    if (password.length > 4) {
+    if (password.length >= 6) {
       setFormError("");
       return true;
     } else {
@@ -49,9 +50,18 @@ const AuthenticationPage = () => {
     }
   }
 
-  function onSignUp() {    
+
+  async function onSignUp() {    
     if( validateEmail() && validatePassword() && validateConfirmPassword() ){
       console.log("Form data is valid");
+      setIsLoading( true );
+      let { data, error } = await supabase.auth.signUp({
+        email : email,
+        password : password
+      });
+      setIsLoading(false);
+      if( error ) Alert.alert(error.message);
+      else { Alert.alert( `Welcome : ${data.user?.email}` ) }
     }
   
   }
@@ -88,7 +98,7 @@ const AuthenticationPage = () => {
           {formError}
         </Text>
       )}
-      <Button onPress={onSignUp} text="Sign up" />
+      <Button onPress={onSignUp} disabled={isLoading} text={ isLoading ? "Creating account..." : "Sign up"} />
       <Text onPress={onSignIn} style={styles.textButton}>
         Sign in
       </Text>
