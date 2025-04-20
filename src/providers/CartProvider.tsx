@@ -47,6 +47,9 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // Czemu renderuje przy każdej zmianie zależności, gdy nie jest użyte z useState, ani useEffect???
   // Problem typu : działa, ale nie wiem dlaczego.
   const totalCost = items.reduce((sum, item) => ( sum += item.product.price * item.quantity ), 0);
+  // Zaokrąglenie do dwóch miejsc po przecinku ma rozwiązać problem niedokładności floatów w JavaScripcie.
+  // Nie wiem czy tak się to robi właściwie.
+  const roundedTotalCost = parseFloat(totalCost.toFixed(2));
 
   return (
     <CartContext.Provider
@@ -54,7 +57,7 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
         items: items,
         addItem: addItem,
         updateQuantity: updateQuantity,
-        totalCost : totalCost
+        totalCost : roundedTotalCost
       }}
     >
       {children}
