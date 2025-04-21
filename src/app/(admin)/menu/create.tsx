@@ -1,10 +1,11 @@
 import { Alert, Image, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@/src/components/Button";
 import { defaultPizzaImage } from "@/src/components/ProductListItem";
 import Colors from "@/src/constants/Colors";
 import * as ImagePicker from 'expo-image-picker';
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useDeleteProduct, useInsertProduct, useProduct, useUpdateProduct } from "@/src/api/products";
 
 const CreateProductScreen = () => {
   const [name, setName] = useState<string>("");
@@ -12,12 +13,29 @@ const CreateProductScreen = () => {
   const [errors, setErrors] = useState<string[]>([]);
   // Image picker 
   const [image, setImage] = useState<string | null>(null);
+  
+  const router = useRouter();
 
   // Id of product that is updating
   // Component create produc screen also handles updating if id search param is present like this url?id=
-  const { id } = useLocalSearchParams();
+  const { id : idString } = useLocalSearchParams();
+  const id = parseFloat( typeof idString === "string" ? idString : idString[0] );
   const isUpdating = Boolean(id);
 
+  const { mutate : insertProduct } = useInsertProduct();
+  const { mutate : updateProduct } = useUpdateProduct();
+  const { data : updatingProduct } = useProduct(id);
+  const { mutate : deleteProduct } = useDeleteProduct();
+
+  useEffect(()=>{
+    console.log("updatingProduct changed", updatingProduct)
+    if( updatingProduct ){
+      setName( updatingProduct.name );
+      setPrice( updatingProduct.price.toString() );
+      setImage( updatingProduct.image );
+    }
+  },[updatingProduct])
+  
   // Function that decides if product is meant to be updated or created
   function onSubmit(){
     if( isUpdating ){
@@ -35,8 +53,12 @@ const CreateProductScreen = () => {
     console.log("Create product clicked");
     
     // save in database
-
-    resetFields();
+    insertProduct({ name, price : parseFloat(price), image }, {
+      onSuccess : () => {
+        resetFields();
+        router.back();
+      }
+    });    
   }
 
   function onUpdateCreate() {
@@ -47,12 +69,25 @@ const CreateProductScreen = () => {
     console.log("Update product clicked");
     
     // save in database
-
-    resetFields();
+    updateProduct({
+      id : id,
+      name : name,
+      price : parseFloat(price),
+      image : image
+    }, {
+      onSuccess : () => {
+        resetFields();
+        router.back();
+      }
+    })
   }
 
   function onDelete(){
     console.log("On delete function called");
+    deleteProduct(id, { onSuccess : () => {
+      resetFields();
+      router.push("/(admin)/menu")
+    }});
   }
 
   function confirmDelete() {
@@ -72,6 +107,7 @@ const CreateProductScreen = () => {
   function resetFields() {
     setName("");
     setPrice("");
+    setImage(null);
   }
 
   function validateInput(){
@@ -118,14 +154,14 @@ const CreateProductScreen = () => {
       <Image source={{ uri : image || defaultPizzaImage }} style={styles.image }/>
       <Text onPress={pickImage} style={styles.textButton}>Select image</Text>
 
-      <Text style={styles.label}>{ isUpdating ? "Update" : "Create" }</Text>
+      <Text style={styles.label}>{ isUpdating ? "Update - name" : "Create - name" }</Text>
       <TextInput
         value={name}
         onChangeText={setName}
         placeholder="Name"
         style={styles.input}
       />
-      <Text style={styles.label}>{ isUpdating ? "Update" : "Create" }</Text>
+      <Text style={styles.label}>{ isUpdating ? "Update - price" : "Create - price" }</Text>
       <TextInput
         value={price.toString()}
         onChangeText={setPrice}

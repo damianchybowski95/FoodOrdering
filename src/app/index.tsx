@@ -1,12 +1,12 @@
 import { View, Text, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../components/Button";
 import { Link, Redirect } from "expo-router";
 import { useAuth } from "../providers/AuthProvider";
 import { supabase } from "../lib/supabase";
 
 const index = () => {
-  const { session, loading, isAdmin } = useAuth();
+  const { session, loading, isAdmin, profile } = useAuth();
 
   if (loading) {
     return <ActivityIndicator />;

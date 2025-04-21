@@ -1,22 +1,26 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
-import products from "@/assets/data/products";
+// import products from "@/assets/data/products";
 import { defaultPizzaImage } from "@/src/components/ProductListItem";
-import Button from "@/src/components/Button";
+// import Button from "@/src/components/Button";
 import { useCart } from "@/src/providers/CartProvider";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "@/src/constants/Colors";
+import { useProduct } from "@/src/api/products";
 
 const sizes: Array<"S" | "M" | "L" | "XL"> = ["S", "M", "L", "XL"];
 
 const ProductDetailPage = () => {
-  const { id } = useLocalSearchParams();
+  const { id : idString } = useLocalSearchParams();
+  const id = parseFloat( typeof idString === "string" ? idString : idString[0] );  
+  const { data : product, error,  isLoading } = useProduct(id);
+
   const router = useRouter();
 
   const [selectedSize, setSelectedSize] = useState<(typeof sizes)[number]>("M");
 
-  const product = products.find((p) => p.id.toString() === id);
+  // const product = products.find((p) => p.id.toString() === id);
 
   // Cart context provider
   const { items, addItem } = useCart();
@@ -28,6 +32,13 @@ const ProductDetailPage = () => {
     router.push("/cart");
     return ""
   }
+
+  if( isLoading ) 
+    return <ActivityIndicator/>
+  
+  if( error ) 
+    return <Text>Failed to fetch the product</Text>
+
 
   if (!product) {
     return <Text>Product not found</Text>;
@@ -95,8 +106,7 @@ const ProductDetailPage = () => {
           );
         })}
       </View> */}
-
-      <Text style={styles.price}>${product.price}</Text>
+      <Text style={styles.price}>{product.name} - ${product.price}</Text>
 
       {/* <Button onPress={addToCart} text="Add to cart"/> */}
     </View>

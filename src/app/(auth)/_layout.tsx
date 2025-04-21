@@ -5,6 +5,7 @@ import { useAuth } from '@/src/providers/AuthProvider'
 
 const AuthLayout = () => {
   const { session } = useAuth();
+  
   if( session ) {
     return <Redirect href={"/"} />
   }

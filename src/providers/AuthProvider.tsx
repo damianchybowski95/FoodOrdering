@@ -38,8 +38,8 @@ export default function AuthProvider({
         console.log("sql data: ", data?.group);
         setProfile(data?.group || null);
         // Loading powinno być wyłączane na końcu operacji.
-        setLoading(false);
       }
+      setLoading(false);
     };
     fetchSessions();
     supabase.auth.onAuthStateChange((_event, session) => {

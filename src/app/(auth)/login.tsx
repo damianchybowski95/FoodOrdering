@@ -7,14 +7,14 @@ import { supabase } from "@/src/lib/supabase";
 
 const AuthenticationPage = () => {
   const router = useRouter();
+  
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   function onSignUp() {
     router.push("/(auth)/signup");
   }
-
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   async function onLogin() {
     setIsLoading(true)
