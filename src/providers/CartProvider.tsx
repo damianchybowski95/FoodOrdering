@@ -1,10 +1,11 @@
 import { createContext, useContext, useState } from "react";
 import { CartItem, Product } from "../types";
 import { randomUUID } from "expo-crypto";
+import { Tables } from "@/database.types";
 
 type CartType = {
   items: CartItem[];
-  addItem: (product: Product, size: CartItem["size"]) => void;
+  addItem: (product: Tables<"products">, size: CartItem["size"]) => void;
   updateQuantity: (itemId: string, amount: -1 | 1) => void;
   totalCost : number
 };
@@ -19,7 +20,7 @@ export const CartContext = createContext<CartType>({
 const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   
-  const addItem = (product: Product, size: CartItem["size"]) => {
+  const addItem = (product: Tables<"products">, size: CartItem["size"]) => {
     // If allready in a cart increment quantity
     const existingItem = items.find( (item) => item.product === product && item.size === size )
     if( existingItem ){

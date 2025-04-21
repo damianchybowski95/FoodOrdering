@@ -3,11 +3,12 @@ import Colors from "@/src/constants/Colors";
 import { Product } from "@/src/types";
 import { Link, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { Tables } from "@/database.types";
 
 export const defaultPizzaImage =
   "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
 
-const ProductListItem = ({ product }: { product: Product }) => {
+const ProductListItem = ({ product }: { product: Tables<"products"> }) => {
   const segments = useSegments()
 
   return (
