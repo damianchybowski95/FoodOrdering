@@ -3,23 +3,44 @@ import React, { useEffect, useState } from "react";
 import Button from "@/src/components/Button";
 import { defaultPizzaImage } from "@/src/components/ProductListItem";
 import Colors from "@/src/constants/Colors";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useDeleteProduct, useInsertProduct, useProduct, useUpdateProduct } from "@/src/api/products";
+import {
+  useDeleteProduct,
+  useInsertProduct,
+  useProduct,
+  useUpdateProduct,
+} from "@/src/api/products";
+import { z } from "zod";
+import { randomUUID } from "expo-crypto";
+import { decode } from "base64-arraybuffer";
+import { supabase } from "@/src/lib/supabase";
+import * as FileSystem from 'expo-file-system';
 
 const CreateProductScreen = () => {
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("0");
   const [errors, setErrors] = useState<string[]>([]);
-  // Image picker 
+  // Image picker
   const [image, setImage] = useState<string | null>(null);
-  
+
   const router = useRouter();
+
+  useEffect(() => {
+    console.log("Create screen");
+  }, []);
 
   // Id of product that is updating
   // Component create produc screen also handles updating if id search param is present like this url?id=
-  const { id : idString } = useLocalSearchParams();
-  const id = parseFloat( typeof idString === "string" ? idString : idString[0] );
+  // It can be undefined aswell.
+  const { id: idMaybeString } = useLocalSearchParams();
+
+  const idString = z.string().safeParse(idMaybeString).success
+    ? idMaybeString as string
+    : z.array(z.string()).safeParse(idMaybeString).success
+    ? idMaybeString[0]
+    : "";
+  const id = parseFloat(idString);  
   const isUpdating = Boolean(id);
 
   const { mutate : insertProduct } = useInsertProduct();
@@ -35,7 +56,7 @@ const CreateProductScreen = () => {
       setImage( updatingProduct.image );
     }
   },[updatingProduct])
-  
+
   // Function that decides if product is meant to be updated or created
   function onSubmit(){
     if( isUpdating ){
@@ -45,35 +66,57 @@ const CreateProductScreen = () => {
     }
   }
 
-  function onCreate() {
+  const uploadImage = async () => {
+    if (!image?.startsWith('file://')) {
+      return;
+    }
+  
+    const base64 = await FileSystem.readAsStringAsync(image, {
+      encoding: 'base64',
+    });
+    const filePath = `${randomUUID()}.png`;
+    const contentType = 'image/png';
+    const { data, error } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, decode(base64), { contentType });
+  
+    if (data) {
+      return data.path;
+    }
+  };
+
+
+  async function onCreate() {
     if( !validateInput() ){
       return;
     }
 
     console.log("Create product clicked");
-    
+    const imagePath = await uploadImage();
+
     // save in database
-    insertProduct({ name, price : parseFloat(price), image }, {
+    insertProduct({ name, price : parseFloat(price), image : imagePath }, {
       onSuccess : () => {
         resetFields();
         router.back();
       }
-    });    
+    });
   }
 
-  function onUpdateCreate() {
+  async function onUpdateCreate() {
     if( !validateInput() ){
       return;
     }
 
     console.log("Update product clicked");
-    
+    const imagePath = await uploadImage();
+
     // save in database
     updateProduct({
       id : id,
       name : name,
       price : parseFloat(price),
-      image : image
+      image : imagePath
     }, {
       onSuccess : () => {
         resetFields();
@@ -131,7 +174,7 @@ const CreateProductScreen = () => {
     return true;
   }
 
-  const pickImage = async () => {    
+  const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images', 'videos'],
@@ -196,15 +239,15 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 20,
   },
-  image : {
-    width : "50%",
-    aspectRatio : 1,
-    alignSelf : "center"
+  image: {
+    width: "50%",
+    aspectRatio: 1,
+    alignSelf: "center",
   },
-  textButton : {
-    alignSelf : "center",
-    fontWeight : "bold",
-    color : Colors.light.tint,
-    marginVertical : 10
-  }
+  textButton: {
+    alignSelf: "center",
+    fontWeight: "bold",
+    color: Colors.light.tint,
+    marginVertical: 10,
+  },
 });

@@ -42,6 +42,12 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
+      <Tabs.Screen name="profile" options={{
+        title : "Profile",
+        headerTitleAlign : "center",
+        tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />
+      }}/>
+      
       {/* Usuwa z menu element który służy do przekierowania do karty menu. Indeks głównej nawigacji tylko przekierowuje do menu*/}
       <Tabs.Screen name="index" options={{ href : null }}/>
     </Tabs>

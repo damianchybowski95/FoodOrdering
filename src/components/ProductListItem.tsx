@@ -3,7 +3,9 @@ import Colors from "@/src/constants/Colors";
 import { Product } from "@/src/types";
 import { Link, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { Tables } from "@/database.types";
+import { Tables } from "../database.types";
+import RemoteImage from "./RemoteImage";
+
 
 export const defaultPizzaImage =
   "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
@@ -16,11 +18,14 @@ const ProductListItem = ({ product }: { product: Tables<"products"> }) => {
     // Wymogiem link jest użycie child node który ma onPress event, dlatego zamiast view jest pressable
     <Link href={`/${segments[0]}/menu/${product.id}`} asChild> 
       <Pressable style={styles.container}>
-        <Image
-          source={{ uri: product.image || defaultPizzaImage }}
+
+        <RemoteImage
+          path={product.image}
           style={styles.image}
+          fallback={defaultPizzaImage}
           resizeMode="contain"
         />
+        
         <Text style={styles.title}>{product.name}</Text>
         <Text style={styles.price}>${product.price}</Text>
         
